@@ -11,7 +11,7 @@ const AdminPanel = () => {
 
   useEffect(() => {
     // Fetch all users data and "I Am In" count for the admin panel
-    axios.get('http://localhost:5000/api/admin')
+    axios.get('https://foodapp-backend-o35r.onrender.com/api/admin')
       .then(response => {
         setUsers(response.data.users);
         setIAmInCount(response.data.iAmInCount); // Set the "I Am In" count
@@ -28,7 +28,7 @@ const AdminPanel = () => {
   const resetUserResponse = (userId) => {
     const adminId = 0; // Example admin ID (replace with actual logic)
 
-    axios.post('http://localhost:5000/api/admin/reset-response', { adminId, userId })
+    axios.post('https://foodapp-backend-o35r.onrender.com/api/admin/reset-response', { adminId, userId })
       .then(() => {
         // Optimistic update: Directly update the state after resetting
         setUsers(users.map(user => 
@@ -53,7 +53,7 @@ const AdminPanel = () => {
     try {
       // Assuming adminId = 0 for now, replace with actual admin logic
       const adminId = 0;
-      const response = await axios.post('http://localhost:5000/api/admin/add-user', { adminId, name: userName });
+      const response = await axios.post('https://foodapp-backend-o35r.onrender.com/api/admin/add-user', { adminId, name: userName });
       setUserAddedMessage(response.data.message); // Display success message from server
       setUserName(''); // Reset input field
       setError('');

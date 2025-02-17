@@ -9,7 +9,7 @@ const UserPanel = () => {
 
   // Fetch users from the backend
   useEffect(() => {
-    axios.get('http://localhost:5000/api/users')
+    axios.get('https://foodapp-backend-o35r.onrender.com/api/users')
       .then(response => {
         setUsers(response.data);
         setLoading(false);
@@ -23,11 +23,11 @@ const UserPanel = () => {
 
   // Handle user responses
   const handleResponse = (userId, response) => {
-    axios.post('http://localhost:5000/api/users/response', { userId, response })
+    axios.post('https://foodapp-backend-o35r.onrender.com/api/users/response', { userId, response })
       .then(() => {
         alert(`Response for user ${userId}: ${response} saved.`);
         // Fetch updated users to reflect response time
-        axios.get('http://localhost:5000/api/users')
+        axios.get('https://foodapp-backend-o35r.onrender.com/api/users')
           .then(response => {
             setUsers(response.data);
           });
