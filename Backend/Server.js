@@ -68,6 +68,35 @@ app.post('/api/admin/reset-response', (req, res) => {
   res.send(`Response for user ${userId} has been reset.`);
 });
 
+// Endpoint to add a new user (admin only)
+app.post('/api/admin/add-user', (req, res) => {
+    const { adminId, name } = req.body;
+  
+    // Check if the request is from the admin
+    if (adminId !== admin.id) {
+      return res.status(403).send('You do not have permission to add users.');
+    }
+  
+    // Check if the name is provided
+    if (!name) {
+      return res.status(400).send('User name is required.');
+    }
+  
+    // Create a new user object
+    const newUser = {
+      id: users.length + 1,  // Assign a new ID (incremental)
+      name: name,
+      response: null,
+      responseTime: null,
+    };
+  
+    // Add the new user to the users array
+    users.push(newUser);
+  
+    res.status(201).send(`User ${name} added successfully.`);
+  });
+  
+
 const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

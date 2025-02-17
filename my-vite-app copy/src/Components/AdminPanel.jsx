@@ -6,6 +6,8 @@ const AdminPanel = () => {
   const [iAmInCount, setIAmInCount] = useState(0); // State to store the "I Am In" count
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(''); // Error state
+  const [userName, setUserName] = useState(''); // User name input for adding a new user
+  const [userAddedMessage, setUserAddedMessage] = useState(''); // Message after adding user
 
   useEffect(() => {
     // Fetch all users data and "I Am In" count for the admin panel
@@ -24,23 +26,41 @@ const AdminPanel = () => {
 
   // Reset user response
   const resetUserResponse = (userId) => {
-    // Assuming you have a way to authenticate/admin user, such as token
     const adminId = 0; // Example admin ID (replace with actual logic)
 
     axios.post('http://localhost:5000/api/admin/reset-response', { adminId, userId })
       .then(() => {
+        // Optimistic update: Directly update the state after resetting
+        setUsers(users.map(user => 
+          user.id === userId ? { ...user, response: null, responseTime: null } : user
+        ));
         alert(`Response for user ${userId} has been reset.`);
-        // Fetch updated users to reflect the reset response
-        axios.get('http://localhost:5000/api/admin')
-          .then(response => {
-            setUsers(response.data.users);
-            setIAmInCount(response.data.iAmInCount);
-          });
       })
       .catch(error => {
         console.error('Error resetting response:', error);
         alert('Error resetting response');
       });
+  };
+
+  // Handle adding a new user
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+    if (!userName) {
+      setError('User name is required.');
+      return;
+    }
+
+    try {
+      // Assuming adminId = 0 for now, replace with actual admin logic
+      const adminId = 0;
+      const response = await axios.post('http://localhost:5000/api/admin/add-user', { adminId, name: userName });
+      setUserAddedMessage(response.data.message); // Display success message from server
+      setUserName(''); // Reset input field
+      setError('');
+    } catch (error) {
+      setError('Error adding user');
+      console.error('Error adding user:', error);
+    }
   };
 
   if (loading) {
@@ -54,9 +74,33 @@ const AdminPanel = () => {
   return (
     <div className="max-w-4xl mx-auto mt-8">
       <h2 className="text-3xl font-semibold text-center mb-6">Admin Panel</h2>
+
       <div className="text-center mb-4">
         <p className="text-xl font-medium">"I Am In" Count: {iAmInCount}</p>
       </div>
+
+      {/* Add User Section */}
+      <div className="mb-6">
+        <h3 className="text-xl font-medium mb-3">Add New User</h3>
+        <form onSubmit={handleAddUser} className="flex justify-center">
+          <input
+            type="text"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+            className="p-2 border rounded-md"
+            placeholder="Enter user name"
+          />
+          <button type="submit" className="ml-4 bg-blue-500 text-white px-4 py-2 rounded-md">
+            Add User
+          </button>
+        </form>
+        {userAddedMessage && (
+          <div className="mt-2 text-green-500 text-center">
+            {userAddedMessage}
+          </div>
+        )}
+      </div>
+
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white shadow-md rounded-md">
           <thead>
