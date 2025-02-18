@@ -19,7 +19,7 @@ let users = [
   { id: 9, name: 'Edwin Kishore Raj', response: null, responseTime: null },
   { id: 10, name: 'Naveen Kumar', response: null, responseTime: null },
   { id: 11, name: 'Hari Sanjay', response: null, responseTime: null },
-  { id: 12, name: 'Raghul Sanjay', response: null, responseTime: null }
+  { id: 12, name: 'Raghul Sanjay', response: null, responseTime: null },
   { id: 13, name: 'Kayal', response: null, responseTime: null },
   { id: 14, name: 'Kishore', response: null, responseTime: null },
   { id: 15 name: 'Priyadharsini', response: null, responseTime: null },
