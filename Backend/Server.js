@@ -14,7 +14,7 @@ let users = [
   { id: 4, name: 'Kishore.N', response: null, responseTime: null },
   { id: 5, name: 'Shakthi.E.K', response: null, responseTime: null },
   { id: 6, name: 'Sundarrajan.P.S', response: null, responseTime: null },
-  { id: 7, name: 'ManiKandan.K.B', response: null, responseTime: null }
+  { id: 7, name: 'ManiKandan.K.B', response: null, responseTime: null },
   { id: 8, name: 'Charulatha.R', response: null, responseTime: null },
   { id: 9, name: 'Edwin Kishore Raj', response: null, responseTime: null },
   { id: 10, name: 'Naveen Kumar', response: null, responseTime: null },
@@ -22,7 +22,7 @@ let users = [
   { id: 12, name: 'Raghul Sanjay', response: null, responseTime: null },
   { id: 13, name: 'Kayal', response: null, responseTime: null },
   { id: 14, name: 'Kishore', response: null, responseTime: null },
-  { id: 15 name: 'Priyadharsini', response: null, responseTime: null },
+  { id: 15,name: 'Priyadharsini', response: null, responseTime: null },
   { id: 16, name: 'Kavin', response: null, responseTime: null },
  
 ];
