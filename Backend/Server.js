@@ -1,117 +1,198 @@
-// server.js or app.js
-const express = require('express');
-const app = express();
-const cors = require('cors');
-const bodyParser = require('body-parser');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const dotenv = require("dotenv");
+const cron = require("node-cron");
 
+dotenv.config();
+const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-let users = [
-  { id: 1, name: 'Sujitha', response: null, responseTime: null },
-  { id: 2, name: 'Balaji', response: null, responseTime: null },
-  { id: 3, name: 'Keerthivasan.S', response: null, responseTime: null },
-  { id: 4, name: 'Kishore.N', response: null, responseTime: null },
-  { id: 5, name: 'Shakthi.E.K', response: null, responseTime: null },
-  { id: 6, name: 'Sundarrajan.P.S', response: null, responseTime: null },
-  { id: 7, name: 'ManiKandan.K.B', response: null, responseTime: null },
-  { id: 8, name: 'Charulatha.R', response: null, responseTime: null },
-  { id: 9, name: 'Edwin Kishore Raj', response: null, responseTime: null },
-  { id: 10, name: 'Naveen Kumar', response: null, responseTime: null },
-  { id: 11, name: 'Hari Sanjay', response: null, responseTime: null },
-  { id: 12, name: 'Raghul Sanjay', response: null, responseTime: null },
-  { id: 13, name: 'Kayal', response: null, responseTime: null },
-  { id: 14, name: 'Kishore', response: null, responseTime: null },
-  { id: 15,name: 'Priyadharsini', response: null, responseTime: null },
-  { id: 16, name: 'Kavin', response: null, responseTime: null },
- 
-];
+const MONGO_URI =
+  "mongodb+srv://keerthivasan903:vasan2282@cluster0.wjnau.mongodb.net/foodApp?retryWrites=true&w=majority";
 
-// Dummy admin user (for demonstration purposes)
-const admin = { id: 0, name: 'Admin' };
+mongoose
+  .connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ MongoDB Connected Successfully!"))
+  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
-app.get('/api/users', (req, res) => {
-  res.json(users);
+const userSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    phone: {
+      type: String,
+      required: true,
+      unique: true,
+      match: [/^\d{10}$/, "Phone number must be exactly 10 digits"],
+    },
+    response: { type: String, default: null },
+    responseTime: { type: Date, default: null },
+  },
+  { timestamps: true }
+);
+
+const User = mongoose.model("User", userSchema);
+
+const admin = { id: 0, name: "Admin" };
+
+// ✅ User Login
+app.post("/api/login", async (req, res) => {
+  try {
+    const { phone } = req.body;
+    const user = await User.findOne({ phone });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ message: "Login successful", user });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
 });
 
-app.post('/api/users/response', (req, res) => {
-  const { userId, response } = req.body;
-  const user = users.find(u => u.id === userId);
-
-  if (!user) {
-    return res.status(404).send('User not found');
+// ✅ Get All Users
+app.get("/api/users", async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
   }
-
-  const currentTime = Date.now();
-  if (user.response && currentTime - user.responseTime < 24 * 60 * 60 * 1000) {
-    return res.status(400).send('You have already responded within the last 24 hours.');
-  }
-
-  user.response = response;
-  user.responseTime = currentTime;
-
-  res.send('Response saved.');
 });
 
-app.get('/api/admin', (req, res) => {
-  // Calculate the count of users who responded with "I Am In"
-  const iAmInCount = users.filter(user => user.response === 'I Am In').length;
+// ✅ Get a User's Response
+app.get("/api/users/response/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
 
-  res.json({
-    users: users,
-    iAmInCount: iAmInCount, // Add this count to the response
-  });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ response: user.response || null });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
 });
 
-// Endpoint to reset a user's response (admin only)
-app.post('/api/admin/reset-response', (req, res) => {
-  const { adminId, userId } = req.body;
-  if (adminId !== admin.id) {
-    return res.status(403).send('You do not have permission to reset responses.');
+// ✅ Submit a Response
+app.post("/api/users/response", async (req, res) => {
+  try {
+    const { userId, response } = req.body;
+    const user = await User.findById(userId);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const currentTime = Date.now();
+    if (user.response && currentTime - new Date(user.responseTime).getTime() < 24 * 60 * 60 * 1000) {
+      return res.status(400).json({ message: "You have already responded within the last 24 hours." });
+    }
+
+    user.response = response;
+    user.responseTime = new Date();
+    await user.save();
+
+    res.json({ message: "Response saved successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error saving response" });
   }
-
-  const user = users.find(u => u.id === userId);
-
-  if (!user) {
-    return res.status(404).send('User not found');
-  }
-
-  user.response = null;
-  user.responseTime = null;
-
-  res.send(`Response for user ${userId} has been reset.`);
 });
 
-// Endpoint to add a new user (admin only)
-app.post('/api/admin/add-user', (req, res) => {
-    const { adminId, name } = req.body;
-  
-    // Check if the request is from the admin
+// ✅ Get Admin Dashboard Data
+app.get("/api/admin", async (req, res) => {
+  try {
+    const users = await User.find();
+    const iAmInCount = users.filter((user) => user.response === "I Am In").length;
+
+    res.json({ users, iAmInCount });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+// ✅ Add a User (Admin Only)
+app.post("/api/admin/add-user", async (req, res) => {
+  try {
+    const { adminId, name, phone } = req.body;
+
     if (adminId !== admin.id) {
-      return res.status(403).send('You do not have permission to add users.');
+      return res.status(403).json({ message: "You do not have permission to add users." });
     }
-  
-    // Check if the name is provided
-    if (!name) {
-      return res.status(400).send('User name is required.');
+    if (!name || !phone) {
+      return res.status(400).json({ message: "User name and phone number are required." });
     }
-  
-    // Create a new user object
-    const newUser = {
-      id: users.length + 1,  // Assign a new ID (incremental)
-      name: name,
-      response: null,
-      responseTime: null,
-    };
-  
-    // Add the new user to the users array
-    users.push(newUser);
-  
-    res.status(201).send(`User ${name} added successfully.`);
-  });
-  
 
+    // Check if phone number already exists
+    const existingUser = await User.findOne({ phone });
+    if (existingUser) {
+      return res.status(400).json({
+        message: "Phone number already exists.",
+        existingUser, // Return user details for frontend handling
+      });
+    }
+
+    const newUser = new User({ name, phone });
+    await newUser.save();
+
+    res.status(201).json({ message: `User ${name} added successfully.` });
+  } catch (error) {
+    res.status(500).json({ message: "Error adding user" });
+  }
+});
+
+
+// ✅ Reset User Response (Admin Only)
+app.post("/api/admin/reset-response", async (req, res) => {
+  try {
+    const { adminId, userId } = req.body;
+
+    if (adminId !== admin.id) return res.status(403).json({ message: "You do not have permission to reset responses." });
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.response = null;
+    user.responseTime = null;
+    await user.save();
+
+    res.json({ message: "User response reset successfully." });
+  } catch (error) {
+    res.status(500).json({ message: "Error resetting response" });
+  }
+});
+
+// ✅ Delete a User (Admin Only)
+app.delete("/api/admin/delete-user/:userId", async (req, res) => {
+  try {
+    const { adminId } = req.body;
+    const { userId } = req.params;
+
+    if (adminId !== admin.id) return res.status(403).json({ message: "You do not have permission to delete users." });
+
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ message: `User ${user.name} deleted successfully.` });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting user" });
+  }
+});
+
+// ✅ Cron Job to Reset Responses Every 59 Minutes
+cron.schedule("*/59 * * * *", async () => {
+  try {
+    await User.updateMany({}, { response: null, responseTime: null });
+    console.log("✅ All user responses reset successfully.");
+  } catch (error) {
+    console.error("❌ Error resetting user responses:", error);
+  }
+});
+
+// ✅ Start the Server
 const PORT = 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
