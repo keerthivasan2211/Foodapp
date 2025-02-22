@@ -42,6 +42,7 @@ const admin = { id: 0, name: "Admin" };
 
 // ✅ User Login
 app.post("/api/login", async (req, res) => {
+  
   try {
     const { phone } = req.body;
     const user = await User.findOne({ phone });
@@ -115,6 +116,7 @@ app.get("/api/admin", async (req, res) => {
 
 // ✅ Add a User (Admin Only)
 app.post("/api/admin/add-user", async (req, res) => {
+  console.log("user added")
   try {
     const { adminId, name, phone } = req.body;
 
