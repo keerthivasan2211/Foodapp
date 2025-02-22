@@ -186,6 +186,7 @@ app.delete("/api/admin/delete-user/:userId", async (req, res) => {
 
 cron.schedule("45 10 * * *", async () => {
   try {
+    console.log("called cron")
     await User.updateMany({}, { response: null, responseTime: null });
     console.log("✅ All user responses reset successfully at 11:00 AM.");
   } catch (error) {
