@@ -182,14 +182,17 @@ app.delete("/api/admin/delete-user/:userId", async (req, res) => {
 });
 
 // ✅ Cron Job to Reset Responses Every 59 Minutes
-cron.schedule("0 0 * * *", async () => {
+
+
+cron.schedule("45 10 * * *", async () => {
   try {
     await User.updateMany({}, { response: null, responseTime: null });
-    console.log("✅ All user responses reset successfully.");
+    console.log("✅ All user responses reset successfully at 11:00 AM.");
   } catch (error) {
     console.error("❌ Error resetting user responses:", error);
   }
 });
+
 
 
 // ✅ Start the Server
