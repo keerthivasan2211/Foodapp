@@ -166,7 +166,7 @@ app.post("/api/admin/reset-response", async (req, res) => {
   }
 });
 
-// ✅ Delete a User (Admin Only)
+//  Delete a User (Admin Only)
 app.delete("/api/admin/delete-user/:userId", async (req, res) => {
   try {
     const { adminId } = req.body;
