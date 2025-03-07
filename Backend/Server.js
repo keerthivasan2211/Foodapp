@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
-const cron = require("node-cron");
 
 dotenv.config();
 const app = express();
@@ -42,7 +41,6 @@ const admin = { id: 0, name: "Admin" };
 
 // ✅ User Login
 app.post("/api/login", async (req, res) => {
-  
   try {
     const { phone } = req.body;
     const user = await User.findOne({ phone });
@@ -116,7 +114,6 @@ app.get("/api/admin", async (req, res) => {
 
 // ✅ Add a User (Admin Only)
 app.post("/api/admin/add-user", async (req, res) => {
-  console.log("user added")
   try {
     const { adminId, name, phone } = req.body;
 
@@ -127,12 +124,11 @@ app.post("/api/admin/add-user", async (req, res) => {
       return res.status(400).json({ message: "User name and phone number are required." });
     }
 
-    // Check if phone number already exists
     const existingUser = await User.findOne({ phone });
     if (existingUser) {
       return res.status(400).json({
         message: "Phone number already exists.",
-        existingUser, // Return user details for frontend handling
+        existingUser,
       });
     }
 
@@ -144,7 +140,6 @@ app.post("/api/admin/add-user", async (req, res) => {
     res.status(500).json({ message: "Error adding user" });
   }
 });
-
 
 // ✅ Reset User Response (Admin Only)
 app.post("/api/admin/reset-response", async (req, res) => {
@@ -166,7 +161,7 @@ app.post("/api/admin/reset-response", async (req, res) => {
   }
 });
 
-//  Delete a User (Admin Only)
+// ✅ Delete a User (Admin Only)
 app.delete("/api/admin/delete-user/:userId", async (req, res) => {
   try {
     const { adminId } = req.body;
@@ -183,24 +178,37 @@ app.delete("/api/admin/delete-user/:userId", async (req, res) => {
   }
 });
 
-// ✅ Cron Job to Reset Responses Every 59 Minutes
+// ✅ Schedule Reset Task Without Cron (Every Day at 10:01:20 PM)
+const scheduleResetTask = () => {
+  const now = new Date();
+  const targetTime = new Date();
 
+  targetTime.setHours(22, 1, 20, 0); // 10:01:20 PM (24-hour format)
 
+  // If time has already passed today, schedule for tomorrow
+  if (now > targetTime) {
+    targetTime.setDate(targetTime.getDate() + 1);
+  }
 
+  const timeUntilExecution = targetTime - now; // Calculate delay in milliseconds
 
-cron.schedule("25 13 * * *", async () => {  // Runs at 1:21 PM every day
-  setTimeout(async () => {  // Delays execution by 20 seconds
+  console.log(`Next reset task scheduled at: ${targetTime}`);
+
+  setTimeout(async () => {
     try {
       await User.updateMany({}, { response: null, responseTime: null });
-      console.log("✅ All user responses reset successfully at 1:21:20 PM.");
+      console.log("✅ All user responses reset successfully at 10:01:20 PM.");
     } catch (error) {
       console.error("❌ Error resetting user responses:", error);
     }
-  }, 20000); // 20 seconds delay
-});
 
+    // Re-schedule for the next day
+    scheduleResetTask();
+  }, timeUntilExecution);
+};
 
-
+// Start the scheduler
+scheduleResetTask();
 
 // ✅ Start the Server
 const PORT = 5000;
