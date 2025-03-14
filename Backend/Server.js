@@ -3,10 +3,17 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
+const corsOptions = {
+  origin: "https://foodapp-brown-three.vercel.app", // Allow only your frontend
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true, // Allow cookies/auth headers if needed
+};
+
+app.use(cors(corsOptions));
 
 dotenv.config();
 const app = express();
-app.use(cors());
+
 app.use(bodyParser.json());
 
 const MONGO_URI =
