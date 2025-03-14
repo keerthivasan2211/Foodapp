@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaUser, FaPhone } from "react-icons/fa";
 
+const BASE_URL = "https://server-l7kzrtsyb-keerthivasan2211s-projects.vercel.app/api";
+
 const User = () => {
   const [phone, setPhone] = useState("");
   const [userData, setUserData] = useState({ user: null, response: "", status: "", loading: false });
@@ -17,9 +19,10 @@ const User = () => {
     setUserData((prev) => ({ ...prev, loading: true }));
 
     try {
-      const { data } = await axios.post("https://server-l7kzrtsyb-keerthivasan2211s-projects.vercel.app/api/login", { phone });
-      const responseData = await axios.get(`https://foodapp-backend-o35r.onrender.com/api/users/response/${data.user._id}`);
-      
+      const { data } = await axios.post(`${BASE_URL}/login`, { phone });
+
+      const responseData = await axios.get(`${BASE_URL}/users/response/${data.user._id}`);
+
       setUserData({
         user: data.user,
         response: responseData.data.response || "",
@@ -36,7 +39,7 @@ const User = () => {
 
   const handleResponseSubmit = async (selectedResponse) => {
     try {
-      await axios.post("https://server-l7kzrtsyb-keerthivasan2211s-projects.vercel.app/api/users/response", {
+      await axios.post(`${BASE_URL}/users/response`, {
         userId: userData.user._id,
         response: selectedResponse,
       });
