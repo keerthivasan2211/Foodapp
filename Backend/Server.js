@@ -39,6 +39,10 @@ const User = mongoose.model("User", userSchema);
 
 const admin = { id: 0, name: "Admin" };
 
+app.get("/", (req, res) => {
+  res.send("✅ Backend is running!");
+});
+
 // ✅ User Login
 app.post("/api/login", async (req, res) => {
   try {
