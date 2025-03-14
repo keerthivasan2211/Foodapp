@@ -16,7 +16,7 @@ const Admin = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("https://foodapp-backend-o35r.onrender.com/api/admin");
+      const response = await axios.get("https://server-l7kzrtsyb-keerthivasan2211s-projects.vercel.app/api/admin");
       setUsers(response.data.users);
     } catch (error) {
       toast.error("Error fetching users!");
@@ -36,7 +36,7 @@ const Admin = () => {
     }
 
     try {
-      await axios.post("https://foodapp-backend-o35r.onrender.com/api/admin/add-user", {
+      await axios.post("https://server-l7kzrtsyb-keerthivasan2211s-projects.vercel.app/api/admin/add-user", {
         adminId,
         name,
         phone,
@@ -53,7 +53,7 @@ const Admin = () => {
 
   const resetResponse = async (userId) => {
     try {
-      await axios.post("https://foodapp-backend-o35r.onrender.com/api/admin/reset-response", {
+      await axios.post("https://server-l7kzrtsyb-keerthivasan2211s-projects.vercel.app/api/admin/reset-response", {
         adminId,
         userId,
       });
@@ -66,7 +66,7 @@ const Admin = () => {
 
   const deleteUser = async (userId) => {
     try {
-      await axios.delete(`https://foodapp-backend-o35r.onrender.com/api/admin/delete-user/${userId}`, {
+      await axios.delete(`https://server-l7kzrtsyb-keerthivasan2211s-projects.vercel.app/api/admin/delete-user/${userId}`, {
         data: { adminId },
       });
       toast.success("🗑️ User deleted successfully!");
