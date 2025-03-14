@@ -3,44 +3,35 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
-const cors = require("cors");
-
-// ✅ Allow only specific frontend domains
-app.use(
-  cors({
-    origin: "https://foodapp-brown-three.vercel.app",
-    methods: "GET,POST,PUT,DELETE",
-    credentials: true, // If using cookies or authentication
-  })
-);
-
-// Apply CORS middleware with options
+const cron = require("node-cron");
 
 dotenv.config();
 const app = express();
 
+// ✅ Allow only specific frontend domains
+const corsOptions = {
+  origin: ["https://foodapp-5yth.vercel.app", "https://foodapp-brown-three.vercel.app"], // Your frontend URLs
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+  credentials: true, // Allow cookies
+};
+
+// ✅ Apply middleware in correct order
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
-const MONGO_URI =
-  "mongodb+srv://keerthivasan903:vasan2282@cluster0.wjnau.mongodb.net/foodApp?retryWrites=true&w=majority";
-
+// ✅ MongoDB Connection
+const MONGO_URI = process.env.MONGO_URI || "your_mongo_db_connection_string_here";
 mongoose
-  .connect(MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("✅ MongoDB Connected Successfully!"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
+// ✅ User Schema & Model
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    phone: {
-      type: String,
-      required: true,
-      unique: true,
-      match: [/^\d{10}$/, "Phone number must be exactly 10 digits"],
-    },
+    phone: { type: String, required: true, unique: true, match: [/^\d{10}$/, "Phone number must be exactly 10 digits"] },
     response: { type: String, default: null },
     responseTime: { type: Date, default: null },
   },
@@ -49,8 +40,10 @@ const userSchema = new mongoose.Schema(
 
 const User = mongoose.model("User", userSchema);
 
+// ✅ Admin Data
 const admin = { id: 0, name: "Admin" };
 
+// ✅ Default Route
 app.get("/", (req, res) => {
   res.send("✅ Backend is running!");
 });
@@ -133,7 +126,7 @@ app.post("/api/admin/add-user", async (req, res) => {
   try {
     const { adminId, name, phone } = req.body;
 
-    if (adminId !== admin.id) {
+    if (parseInt(adminId) !== admin.id) {
       return res.status(403).json({ message: "You do not have permission to add users." });
     }
     if (!name || !phone) {
@@ -142,10 +135,7 @@ app.post("/api/admin/add-user", async (req, res) => {
 
     const existingUser = await User.findOne({ phone });
     if (existingUser) {
-      return res.status(400).json({
-        message: "Phone number already exists.",
-        existingUser,
-      });
+      return res.status(400).json({ message: "Phone number already exists.", existingUser });
     }
 
     const newUser = new User({ name, phone });
@@ -162,7 +152,7 @@ app.post("/api/admin/reset-response", async (req, res) => {
   try {
     const { adminId, userId } = req.body;
 
-    if (adminId !== admin.id) return res.status(403).json({ message: "You do not have permission to reset responses." });
+    if (parseInt(adminId) !== admin.id) return res.status(403).json({ message: "You do not have permission to reset responses." });
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -183,7 +173,7 @@ app.delete("/api/admin/delete-user/:userId", async (req, res) => {
     const { adminId } = req.body;
     const { userId } = req.params;
 
-    if (adminId !== admin.id) return res.status(403).json({ message: "You do not have permission to delete users." });
+    if (parseInt(adminId) !== admin.id) return res.status(403).json({ message: "You do not have permission to delete users." });
 
     const user = await User.findByIdAndDelete(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -194,9 +184,7 @@ app.delete("/api/admin/delete-user/:userId", async (req, res) => {
   }
 });
 
-// ✅ Cron Job to Reset Responses Every 59 Minutes
-const cron = require("node-cron");
-
+// ✅ Cron Job to Reset Responses Every Day at 10:45 AM (Server Time)
 cron.schedule("45 10 * * *", async () => {
   try {
     await User.updateMany({}, { response: null, responseTime: null });
@@ -206,11 +194,8 @@ cron.schedule("45 10 * * *", async () => {
   }
 });
 
-// Start the scheduler
-
-
 // ✅ Start the Server
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
