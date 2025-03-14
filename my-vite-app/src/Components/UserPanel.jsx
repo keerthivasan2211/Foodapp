@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaUser, FaPhone } from "react-icons/fa";
 
-const BASE_URL = "https://server-ten-sigma-40.vercel.app/api"; // Updated API URL
+const BASE_URL = "https://foodapp-backend-o35r.onrender.com/api"; // Updated API URL
 
 const User = () => {
   const [phone, setPhone] = useState("");
