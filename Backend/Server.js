@@ -10,14 +10,19 @@ const app = express();
 
 // ✅ Allow only specific frontend domains
 const corsOptions = {
-  origin: ["https://foodapp-5yth.vercel.app", "https://foodapp-brown-three.vercel.app"], // Your frontend URLs
+  origin: "*",  // Allow all origins (for testing)
+  // OR: Restrict to specific origins
+  // origin: ["https://foodapp-brown-three.vercel.app", "https://foodapp-5yth.vercel.app"],  
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-  credentials: true, // Allow cookies
+  credentials: true,
 };
 
-// ✅ Apply middleware in correct order
+// ✅ Apply CORS middleware correctly
 app.use(cors(corsOptions));
+
+// ✅ Handle Preflight Requests (Important!)
+app.options("*", cors());
 app.use(bodyParser.json());
 
 // ✅ MongoDB Connection
