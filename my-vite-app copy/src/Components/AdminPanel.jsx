@@ -3,6 +3,8 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const API_BASE_URL = "https://server-ten-sigma-40.vercel.app/api/admin"; // Updated API URL
+
 const Admin = () => {
   const [users, setUsers] = useState([]);
   const [name, setName] = useState("");
@@ -16,7 +18,7 @@ const Admin = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("https://server-l7kzrtsyb-keerthivasan2211s-projects.vercel.app/api/admin");
+      const response = await axios.get(`${API_BASE_URL}`);
       setUsers(response.data.users);
     } catch (error) {
       toast.error("Error fetching users!");
@@ -36,7 +38,7 @@ const Admin = () => {
     }
 
     try {
-      await axios.post("https://server-l7kzrtsyb-keerthivasan2211s-projects.vercel.app/api/admin/add-user", {
+      await axios.post(`${API_BASE_URL}/add-user`, {
         adminId,
         name,
         phone,
@@ -53,7 +55,7 @@ const Admin = () => {
 
   const resetResponse = async (userId) => {
     try {
-      await axios.post("https://server-l7kzrtsyb-keerthivasan2211s-projects.vercel.app/api/admin/reset-response", {
+      await axios.post(`${API_BASE_URL}/reset-response`, {
         adminId,
         userId,
       });
@@ -66,7 +68,7 @@ const Admin = () => {
 
   const deleteUser = async (userId) => {
     try {
-      await axios.delete(`https://server-l7kzrtsyb-keerthivasan2211s-projects.vercel.app/api/admin/delete-user/${userId}`, {
+      await axios.delete(`${API_BASE_URL}/delete-user/${userId}`, {
         data: { adminId },
       });
       toast.success("🗑️ User deleted successfully!");
