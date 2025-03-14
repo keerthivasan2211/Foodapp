@@ -3,14 +3,18 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
+const cors = require("cors");
+
+// ✅ Allow only specific frontend domains
 const corsOptions = {
-  origin: "https://foodapp-brown-three.vercel.app", // Allow only your frontend
+  origin: ["https://foodapp-5yth.vercel.app", "https://foodapp-brown-three.vercel.app"], // Your frontend URLs
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true, // Allow cookies/auth headers if needed
+  allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+  credentials: true, // Allow sending cookies if needed
 };
 
+// Apply CORS middleware with options
 app.use(cors(corsOptions));
-
 dotenv.config();
 const app = express();
 
