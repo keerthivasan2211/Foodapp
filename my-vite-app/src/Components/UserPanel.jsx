@@ -36,7 +36,7 @@ const User = () => {
 
   const handleResponseSubmit = async (selectedResponse) => {
     try {
-      await axios.post("https://server-l7kzrtsyb-keerthivasan2211s-projects.vercel.app//api/users/response", {
+      await axios.post("https://server-l7kzrtsyb-keerthivasan2211s-projects.vercel.app/api/users/response", {
         userId: userData.user._id,
         response: selectedResponse,
       });
