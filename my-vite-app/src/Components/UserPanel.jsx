@@ -17,7 +17,7 @@ const User = () => {
     setUserData((prev) => ({ ...prev, loading: true }));
 
     try {
-      const { data } = await axios.post("https://foodapp-backend-o35r.onrender.com/api/login", { phone });
+      const { data } = await axios.post("https://server-l7kzrtsyb-keerthivasan2211s-projects.vercel.app/api/login", { phone });
       const responseData = await axios.get(`https://foodapp-backend-o35r.onrender.com/api/users/response/${data.user._id}`);
       
       setUserData({
@@ -36,7 +36,7 @@ const User = () => {
 
   const handleResponseSubmit = async (selectedResponse) => {
     try {
-      await axios.post("https://foodapp-backend-o35r.onrender.com/api/users/response", {
+      await axios.post("https://server-l7kzrtsyb-keerthivasan2211s-projects.vercel.app//api/users/response", {
         userId: userData.user._id,
         response: selectedResponse,
       });
