@@ -6,15 +6,16 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 
 // ✅ Allow only specific frontend domains
-const corsOptions = {
-  origin: ["https://foodapp-5yth.vercel.app", "https://foodapp-brown-three.vercel.app"], // Your frontend URLs
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-  credentials: true, // Allow sending cookies if needed
-};
+app.use(
+  cors({
+    origin: "https://foodapp-brown-three.vercel.app",
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true, // If using cookies or authentication
+  })
+);
 
 // Apply CORS middleware with options
-app.use(cors(corsOptions));
+
 dotenv.config();
 const app = express();
 
