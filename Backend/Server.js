@@ -21,7 +21,8 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 // ✅ MongoDB Connection
-const MONGO_URI = process.env.MONGO_URI || "your_mongo_db_connection_string_here";
+const MONGO_URI =
+  "mongodb+srv://keerthivasan903:vasan2282@cluster0.wjnau.mongodb.net/foodApp?retryWrites=true&w=majority";
 mongoose
   .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("✅ MongoDB Connected Successfully!"))
