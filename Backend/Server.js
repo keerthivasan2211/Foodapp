@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
-const cron = require("node-cron");
 
 dotenv.config();
 const app = express();
@@ -125,12 +124,11 @@ app.post("/api/admin/add-user", async (req, res) => {
       return res.status(400).json({ message: "User name and phone number are required." });
     }
 
-    // Check if phone number already exists
     const existingUser = await User.findOne({ phone });
     if (existingUser) {
       return res.status(400).json({
         message: "Phone number already exists.",
-        existingUser, // Return user details for frontend handling
+        existingUser,
       });
     }
 
@@ -142,7 +140,6 @@ app.post("/api/admin/add-user", async (req, res) => {
     res.status(500).json({ message: "Error adding user" });
   }
 });
-
 
 // ✅ Reset User Response (Admin Only)
 app.post("/api/admin/reset-response", async (req, res) => {
@@ -182,6 +179,8 @@ app.delete("/api/admin/delete-user/:userId", async (req, res) => {
 });
 
 // ✅ Cron Job to Reset Responses Every 59 Minutes
+const cron = require("node-cron");
+
 cron.schedule("45 10 * * *", async () => {
   try {
     await User.updateMany({}, { response: null, responseTime: null });
@@ -190,6 +189,8 @@ cron.schedule("45 10 * * *", async () => {
     console.error("❌ Error resetting user responses:", error);
   }
 });
+
+// Start the scheduler
 
 
 // ✅ Start the Server
