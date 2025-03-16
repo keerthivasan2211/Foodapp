@@ -210,7 +210,7 @@ app.post("/api/admin/reset-all-to-not", async (req, res) => {
       return res.status(403).json({ message: "You do not have permission to reset all responses." });
     }
 
-    await User.updateMany({}, { response: "I Am Not", responseTime: new Date() });
+    await User.updateMany({}, { response:null, responseTime: new Date() });
 
     res.json({ message: 'All user responses have been set to "I Am Not".' });
   } catch (error) {
