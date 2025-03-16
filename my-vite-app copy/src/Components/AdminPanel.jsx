@@ -71,13 +71,13 @@ const Admin = () => {
   };
 
   const resetAllResponses = async () => {
-    if (!window.confirm("⚠️ Are you sure you want to reset ALL responses?")) {
+    if (!window.confirm("⚠️ Are you sure you want to reset ALL responses to 'I Am Not'?")) {
       return;
     }
 
     try {
-      await axios.post(`${API_BASE_URL}/reset-all`, { adminId });
-      toast.success("🔄 All responses reset to null!");
+      await axios.post(`${API_BASE_URL}/reset-all-to-not`, { adminId });
+      toast.success("🔄 All responses reset to 'I Am Not'!");
       fetchUsers();
     } catch (error) {
       toast.error("❌ Error resetting all responses!");
@@ -104,17 +104,18 @@ const Admin = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center py-8">
       <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-lg relative">
-        {/* Reset All Button in Top Right */}
-        <button
-          onClick={resetAllResponses}
-          className="absolute top-4 right-4 bg-gray-800 text-white font-semibold px-4 py-2 rounded-md shadow-md hover:bg-gray-900 transition-all"
-        >
-          🔄 Reset All
-        </button>
+        {/* Top Section with Title & Reset All Button */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-3xl font-bold text-gray-900">Admin Panel</h2>
+          <button
+            onClick={resetAllResponses}
+            className="btn btn-danger text-white font-semibold px-4 py-2 rounded-md shadow-md hover:bg-red-700 transition-all"
+          >
+            🔄 Reset All
+          </button>
+        </div>
 
-        <h2 className="text-3xl font-bold text-gray-900 text-center">Admin Panel</h2>
-
-        <div className="text-center mt-4">
+        <div className="text-center mt-2">
           <p className="text-xl font-semibold text-green-700">
             ✅ I Am In Count: {imInCount}
           </p>
