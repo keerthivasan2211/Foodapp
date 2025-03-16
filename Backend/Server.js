@@ -202,6 +202,22 @@ cron.schedule("45 10 * * *", async () => {
   }
 });
 
+app.post("/api/admin/reset-all-to-not", async (req, res) => {
+  try {
+    const { adminId } = req.body;
+
+    if (parseInt(adminId) !== admin.id) {
+      return res.status(403).json({ message: "You do not have permission to reset all responses." });
+    }
+
+    await User.updateMany({}, { response: "I Am Not", responseTime: new Date() });
+
+    res.json({ message: 'All user responses have been set to "I Am Not".' });
+  } catch (error) {
+    res.status(500).json({ message: "Error resetting all responses" });
+  }
+});
+
 // ✅ Start the Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
